@@ -1,7 +1,3 @@
-# streamlit_chat_app.py
-# MechaRek — Mechanical Keyboard Recommender (HYBRID: mock + placeholder LLM integration)
-# Save as streamlit_chat_app.py and run: streamlit run streamlit_chat_app.py
-
 import streamlit as st
 from datetime import datetime
 import re
@@ -16,8 +12,8 @@ KEYBOARDS = [
     {
         "name": "Monka K75",
         "layout": "75%",
-        "switch": "Leobog Reaper (linear)",
-        "price_idr": 315000,
+        "switch": "Star Vector (linear)",
+        "price_idr": 549000,
         "use_case": ["ngoding", "umum"],
         "desc": "75% compact, build solid, linear feel. Budget friendly."
     },
@@ -319,4 +315,4 @@ with col2:
     if st.button("Snapshot / Screenshot Guide"):
         st.info("Simpan 3 screenshot: 1) main chat (contoh percakapan), 2) sidebar (settings), 3) memory expander. Nama file: ui_main.png, ui_sidebar.png, ui_memory.png")
 
-st.caption("Catatan: Ini adalah app hybrid. Untuk memanggil LLM sungguhan, implementasikan fungsi call_llm(...) sesuai provider (contoh di komentar dalam kode).")
+
