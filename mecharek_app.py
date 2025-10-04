@@ -22,7 +22,56 @@ if not google_api_key:
     st.info("Masukkan API key Gemini di sidebar untuk mulai chatting.", icon="🗝️")
     st.stop()
 
-# ========== 3️⃣ Tools Exa API ==========
+# ========== 3️⃣ Dataset Keyboard Lokal ==========
+KEYBOARDS = [
+    {"nama": "Monka K75", "layout": "75%", "switch": "Star Vector (linear)", "harga": 549000,
+     "deskripsi": "Compact, solid build, cocok untuk coding dan gaming santai."},
+    {"nama": "Aula F75", "layout": "75%", "switch": "Leobog Reaper (linear)", "harga": 690000,
+     "deskripsi": "Compact, solid build, cocok untuk coding dan gaming santai."},
+    {"nama": "Ajazz AK33", "layout": "75%", "switch": "Brown (tactile)", "harga": 450000,
+     "deskripsi": "Tactile feel nyaman untuk mengetik lama."},
+    {"nama": "Redragon K617", "layout": "60%", "switch": "Red (linear)", "harga": 650000,
+     "deskripsi": "60% keyboard gaming RGB, budget-friendly."},
+    {"nama": "RK61", "layout": "60%", "switch": "Outemu Red (linear)", "harga": 550000,
+     "deskripsi": "Compact, mudah dibawa, cocok untuk laptop setup."},
+    {"nama": "Keychron K6", "layout": "65%", "switch": "Gateron Red/Brown", "harga": 1200000,
+     "deskripsi": "Wireless, hot-swappable, premium feel."},
+    {"nama": "Akko 3068B", "layout": "65%", "switch": "Akko Jelly Pink (linear)", "harga": 1350000,
+     "deskripsi": "Dual-mode wireless dengan desain estetik."}
+]
+
+def get_keyboard_list():
+    text = "Berikut daftar keyboard mechanical yang dikenal MechaRek:\n"
+    for kb in KEYBOARDS:
+        text += f"- {kb['nama']} ({kb['layout']} | {kb['switch']} | Rp {kb['harga']:,}) — {kb['deskripsi']}\n"
+    return text
+
+# ========== 4️⃣ Tools Lokal & Exa API ==========
+
+@tool
+def get_best_keyboard_by_budget(budget: int) -> str:
+    """Mengembalikan daftar keyboard di bawah budget tertentu (dalam Rupiah)."""
+    hasil = [kb for kb in KEYBOARDS if kb["harga"] <= budget]
+    if not hasil:
+        return f"Tidak ada keyboard di bawah Rp {budget:,}."
+    teks = f"🎯 Keyboard di bawah Rp {budget:,}:\n"
+    for kb in hasil:
+        teks += f"- {kb['nama']} ({kb['layout']} | {kb['switch']} | Rp {kb['harga']:,})\n"
+    return teks
+
+@tool
+def get_switch_info(switch_type: str) -> str:
+    """Memberikan penjelasan tentang tipe switch tertentu (linear/tactile/clicky)."""
+    t = switch_type.lower()
+    if "linear" in t:
+        return "Linear switch terasa halus tanpa feedback tactile. Cocok untuk gaming atau mengetik cepat."
+    elif "tactile" in t:
+        return "Tactile switch punya bump halus tiap tekan. Nyaman untuk mengetik lama tanpa suara bising."
+    elif "clicky" in t:
+        return "Clicky switch menghasilkan bunyi klik jelas dan feedback kuat, disukai penggemar suara klasik."
+    else:
+        return "Jenis switch tidak dikenali. Coba sebut linear, tactile, atau clicky."
+
 @tool
 def search_keyboard_info(query: str) -> str:
     """Mencari informasi keyboard (review, toko online, perbandingan) menggunakan Exa API."""
@@ -40,31 +89,25 @@ def search_keyboard_info(query: str) -> str:
     except Exception as e:
         return f"Terjadi error saat memanggil Exa API: {e}"
 
-tools = [search_keyboard_info]
+tools = [get_best_keyboard_by_budget, get_switch_info, search_keyboard_info]
 
-# ========== 4️⃣ Agent Initialization ==========
+# ========== 5️⃣ Agent Initialization ==========
 if ("agent" not in st.session_state) or (getattr(st.session_state, "_last_key", None) != google_api_key):
     try:
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
             google_api_key=google_api_key,
-            temperature=0.7,
-        )
-
-        gaya_instruksi = (
-            "Gunakan gaya bahasa santai dan akrab seperti teman ngobrol, boleh pakai kata 'nih', 'bro', 'dong'."
-            if gaya_bahasa == "Santai"
-            else "Gunakan bahasa formal, sopan, profesional, dan jelas."
+            temperature=0.6,
         )
 
         prompt_instruction = (
             f"Kamu adalah MechaRek, asisten AI ahli keyboard mechanical. "
-            f"Tugasmu adalah membantu user memilih keyboard berdasarkan kebutuhan mereka "
-            f"(gaming, kerja, coding, budget, preferensi switch). "
-            f"{gaya_instruksi} "
-            f"Jika user meminta review, perbandingan, atau harga terkini, gunakan tool pencarian online jika tersedia. "
-            f"Jika tool tidak tersedia, berikan saran umum berdasarkan pengetahuan umummu. "
-            f"Fokus hanya pada topik keyboard mechanical dan hal-hal terkait."
+            f"Tugasmu adalah membantu user memilih keyboard berdasarkan preferensi "
+            f"(switch, layout, harga, atau kegunaan). Gunakan gaya bahasa yang "
+            f"{'santai dan akrab seperti teman ngobrol' if gaya_bahasa == 'Santai' else 'formal, sopan, dan profesional'}. "
+            f"Gunakan tool yang tersedia bila perlu mencari data tambahan.\n\n"
+            f"Data internal keyboard:\n{get_keyboard_list()}\n\n"
+            "Jika pertanyaan user tidak relevan dengan keyboard, jawab singkat bahwa kamu hanya fokus pada topik itu."
         )
 
         st.session_state.agent = create_react_agent(
@@ -79,7 +122,7 @@ if ("agent" not in st.session_state) or (getattr(st.session_state, "_last_key", 
         st.error(f"Error inisialisasi LLM: {e}")
         st.stop()
 
-# ========== 5️⃣ Chat History ==========
+# ========== 6️⃣ Chat History ==========
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -88,12 +131,12 @@ if reset_button:
     st.session_state.pop("agent", None)
     st.rerun()
 
-# ========== 6️⃣ Display Chat ==========
+# ========== 7️⃣ Display Chat ==========
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# ========== 7️⃣ Chat Input ==========
+# ========== 8️⃣ Chat Input ==========
 prompt = st.chat_input("Tulis pertanyaanmu... Contoh: 'rekomendasi keyboard linear 500 ribuan buat ngoding'")
 
 if prompt:
