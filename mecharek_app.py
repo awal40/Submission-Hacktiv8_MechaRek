@@ -180,7 +180,7 @@ def call_llm(api_key, provider, system_instruction, user_prompt, context=None):
     Example (Google GenAI, pseudocode):
         from google import genai
         client = genai.Client(api_key=api_key)
-        chat = client.chat.create(model="gemini-1.5", messages=[...])
+        chat = client.chat.create(model="gemini-2.5-flash", messages=[...])
         return chat.last_response.content
 
     For safety/portability in this submission, we KEEP THIS AS A PLACEHOLDER.
@@ -208,7 +208,7 @@ with st.sidebar:
     if st.button("Reset Conversation & Memory"):
         st.session_state.pop("messages", None)
         st.session_state.memory = {"prefs": {}, "history": []}
-        st.experimental_rerun()
+        st.rerun()
     st.markdown("---")
     st.info("Workflow: masukkan preferensi di chat (contoh: 'cari keyboard linear 500rb untuk ngoding') atau gunakan bahasa natural.")
 
@@ -302,7 +302,7 @@ if user_input:
         st.session_state.memory["history"].append({"query": user_input, "time": datetime.now().isoformat()})
 
     # rerender by forcing a re-run (Streamlit will show appended messages on top loop)
-    st.experimental_rerun()
+    st.rerun()
 
 # Bottom controls (export)
 st.markdown("---")
@@ -314,6 +314,7 @@ with col1:
 with col2:
     if st.button("Snapshot / Screenshot Guide"):
         st.info("Simpan 3 screenshot: 1) main chat (contoh percakapan), 2) sidebar (settings), 3) memory expander. Nama file: ui_main.png, ui_sidebar.png, ui_memory.png")
+
 
 
 
