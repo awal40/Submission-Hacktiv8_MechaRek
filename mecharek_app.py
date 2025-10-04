@@ -15,6 +15,7 @@ with st.sidebar:
     st.subheader("⚙️ Pengaturan")
     google_api_key = st.text_input("Masukkan Google API Key:", type="password")
     exa_api_key = st.text_input("Masukkan Exa API Key (opsional):", type="password")
+    gaya_bahasa = st.radio("🗣️ Gaya Bahasa", ["Santai", "Formal"], index=0)
     reset_button = st.button("🔄 Reset Percakapan", help="Hapus semua pesan dan mulai dari awal")
 
 if not google_api_key:
@@ -160,3 +161,4 @@ if prompt:
     with st.chat_message("assistant"):
         st.markdown(answer)
     st.session_state.messages.append({"role": "assistant", "content": answer})
+
