@@ -197,7 +197,7 @@ st.caption("Bantuan memilih mechanical keyboard berdasarkan preferensi. (Hybrid:
 # Sidebar controls
 with st.sidebar:
     st.header("Settings & Controls")
-    provider = st.selectbox("LLM Provider (opsional)", ["(none)", "OpenAI", "Google GenAI"])
+    provider = st.selectbox("LLM Provider (opsional)", ["(none)", "OpenAI (ChatGPT)", "Google GenAI (Gemini)"])
     api_key = st.text_input("API Key (optional)", type="password",
                             help="Isi jika ingin mengaktifkan pemanggilan model LLM nyata.")
     style = st.radio("Gaya bahasa", ["Santai", "Formal"])
@@ -314,5 +314,6 @@ with col1:
 with col2:
     if st.button("Snapshot / Screenshot Guide"):
         st.info("Simpan 3 screenshot: 1) main chat (contoh percakapan), 2) sidebar (settings), 3) memory expander. Nama file: ui_main.png, ui_sidebar.png, ui_memory.png")
+
 
 
