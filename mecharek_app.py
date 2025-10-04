@@ -99,10 +99,11 @@ if ("agent" not in st.session_state) or (getattr(st.session_state, "_last_key", 
         )
 
         prompt_instruction = (
-            "Kamu adalah MechaRek, asisten AI ahli keyboard mechanical. "
-            "Tugasmu adalah membantu user memilih keyboard berdasarkan preferensi (switch, layout, harga, atau kegunaan). "
-            "Gunakan gaya bahasa yang ramah, tapi tetap informatif. "
-            "Kamu bisa memakai tool yang tersedia jika perlu data tambahan.\n\n"
+            f"Kamu adalah MechaRek, asisten AI ahli keyboard mechanical. "
+            f"Tugasmu adalah membantu user memilih keyboard berdasarkan preferensi "
+            f"(switch, layout, harga, atau kegunaan). Gunakan gaya bahasa yang "
+            f"{'santai dan akrab seperti teman ngobrol' if gaya_bahasa == 'Santai' else 'formal, sopan, dan profesional'}. "
+            f"Gunakan tool yang tersedia bila perlu mencari data tambahan.\n\n"
             f"Data internal keyboard:\n{get_keyboard_list()}\n\n"
             "Jika pertanyaan user tidak relevan dengan keyboard, jawab singkat bahwa kamu hanya fokus pada topik itu."
         )
@@ -161,4 +162,5 @@ if prompt:
     with st.chat_message("assistant"):
         st.markdown(answer)
     st.session_state.messages.append({"role": "assistant", "content": answer})
+
 
